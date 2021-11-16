@@ -1,0 +1,4 @@
+Extrair o áudio: 
+ffmpeg -i teste1.mp4 -f mp3 -ab 192000 -vn teste1.mp3
+
+ffmpeg -i output.mp4 -i teste1.mp3 -c copy -map 0:v:0 -map 1:a:0 saida.mp4
