@@ -18,6 +18,7 @@ import cv2
 import numpy as np
 import argparse
 import os
+import random as rng
 
 def nothing(x):
     pass
@@ -54,12 +55,39 @@ def find_hsv(video_file):
             l_green=np.array([l_h,l_s,l_v])
             u_green=np.array([u_h,u_s,u_v])
             mask=cv2.inRange(hsv,l_green,u_green)
+            nmask = cv2.blur(mask, (10,10))
             res=cv2.bitwise_and(frame,frame,mask=mask)
             #removendo o background
             f=frame-res
             cv2.imshow("Frame (q-quit,w-retirar green,p-pausa/despausa)",frame)
-            cv2.imshow("Mascara",mask)
-            cv2.imshow("Recorte",f)
+            cv2.imshow("Mascara nmask",nmask)
+            
+
+            #contornos mascara
+            #rcontours, hier_r = cv2.findContours(mask,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_SIMPLE)
+
+            #drawing = np.full((frame_height, frame_width, 3), 255, dtype=np.uint8)
+
+            #for i in range(len(rcontours)):
+            #    color = (0, 0, 0)
+            #    cv2.drawContours(drawing, rcontours, i, color, 2, cv2.LINE_8, hier_r, 0)
+            #r_areas = [cv2.contourArea(c) for c in rcontours]
+            #max_rarea = np.max(r_areas)
+            #for c in rcontours:
+            #    print(f"cv2.contourArea(c) {cv2.contourArea(c)} max_rarea {max_rarea} max_rarea*0.7 {max_rarea*0.70}")
+            #    if cv2.contourArea(c) < 100:
+            #        cv2.drawContours(drawing,[c],-1,0,1)
+
+            #cv2.imshow("Contornos",drawing)
+
+            #kernel = np.ones((5,5),np.uint8)
+            #erosion = cv2.erode(mask,kernel,iterations = 2)
+            #nmask = cv2.blur(erosion, (10,10))
+            #cv2.imshow("Contornos",erosion)
+            
+            res=cv2.bitwise_and(frame,frame,mask=nmask)
+            f=frame-res
+            cv2.imshow("Recorte novo",f)
             
             k=cv2.waitKey(1)
             if k==ord('q'):
@@ -67,6 +95,9 @@ def find_hsv(video_file):
                 cv2.destroyAllWindows()
                 quit()
             if k==ord('w'):
+                #####
+                mask = nmask
+                #####
                 video.release()
                 cv2.destroyAllWindows()
                 return ('w',frame_width,frame_height,l_green,u_green,mask)
